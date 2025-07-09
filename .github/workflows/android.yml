@@ -1,43 +1,44 @@
-# This is a basic workflow to help you get started with Actions.
-name: Android CI
+name: Build React Native Android
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push events but only for the "main" branch
   push:
     branches: [ "main" ]
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  build-android:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # 1. Checks out your repository and its submodules
+      # 1. Checks out your repository and any submodules
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: 'recursive' # <-- This is the required fix
+          submodules: 'recursive'
 
-      # 2. Sets up the Java Development Kit (JDK) for Gradle
+      # 2. Sets up the Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or the version specified in your project
+          cache: 'npm'
+
+      # 3. Installs the JavaScript dependencies from the root directory
+      - name: Install JavaScript dependencies
+        run: npm install
+
+      # 4. Sets up the Java Development Kit (JDK) for Gradle
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      # 3. Grants execute permission to the gradlew script
+      # 5. Grants execute permission to the gradlew script
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
         working-directory: ./android
 
-      # 4. Builds the project using the Gradle wrapper
-      - name: Build with Gradle
-        run: ./gradlew build
+      # 6. Builds the Android App (usually assembleRelease)
+      - name: Build Android Release
+        run: ./gradlew assembleRelease
         working-directory: ./android
