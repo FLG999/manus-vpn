@@ -18,9 +18,11 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # 1. Checks out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # 1. Checks out your repository and its submodules
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive' # <-- This is the required fix
 
       # 2. Sets up the Java Development Kit (JDK) for Gradle
       - name: Set up JDK 17
@@ -31,13 +33,11 @@ jobs:
           cache: gradle
 
       # 3. Grants execute permission to the gradlew script
-      # This step is crucial for running Gradle commands
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        working-directory: ./android # <-- Sets the correct directory
+        working-directory: ./android
 
       # 4. Builds the project using the Gradle wrapper
-      # The 'build' task will compile the app and run checks
       - name: Build with Gradle
         run: ./gradlew build
-        working-directory: ./android # <-- Sets the correct directory
+        working-directory: ./android
